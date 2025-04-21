@@ -38,7 +38,8 @@ public class GiantCommand implements TabExecutor {
             player.sendMessage("| Commands:                      ");
             player.sendMessage("| /giant -> Creates a giant      ");
             player.sendMessage("| /giant help -> Shows this msg  ");
-            player.sendMessage("| /giant kill [id] -> Kills a giant with that specified id");
+            player.sendMessage("| /giant kill [id] -> Kills a giant with the specified id");
+            player.sendMessage("| /giant hostile [id] -> Makes a giant hostile with the specified id");
             return true;
         }
 
@@ -46,19 +47,14 @@ public class GiantCommand implements TabExecutor {
             try {
 
                 int id = Integer.parseInt(args[1]);
-                Entity entity = ((CraftWorld) player.getWorld()).getHandle().getEntity(id);
+                final Entity entity = ((CraftWorld) player.getWorld()).getHandle().getEntity(id);
 
-                if(!entity.isAlive()) {
+                if (entity != null && !entity.isAlive()) {
                     player.sendMessage(ChatColor.RED + "Giant is already dead!");
                     return false;
                 }
 
-                if (entity == null) {
-                    player.sendMessage(ChatColor.RED + "No entity found with ID " + id);
-                    return false;
-                }
-
-                if (!(entity instanceof final Giant giant)) {
+                if (!(entity instanceof final DancingGiant giant)) {
                     player.sendMessage(ChatColor.RED + "Entity with ID " + id + " is not a Giant.");
                     return false;
                 }
@@ -72,14 +68,39 @@ public class GiantCommand implements TabExecutor {
             }
         }
 
+        if (args.length == 2 && args[0].equalsIgnoreCase("hostile")) {
+            try {
+
+                int id = Integer.parseInt(args[1]);
+                final Entity entity = ((CraftWorld) player.getWorld()).getHandle().getEntity(id);
+
+                if (entity != null && !entity.isAlive()) {
+                    player.sendMessage(ChatColor.RED + "Giant is dead!");
+                    return false;
+                }
+
+                if (!(entity instanceof final DancingGiant giant)) {
+                    player.sendMessage(ChatColor.RED + "Entity with ID " + id + " is not a Giant.");
+                    return false;
+                }
+
+                giant.makeHostile();
+                player.sendMessage(ChatColor.GREEN + "[!] Successfully removed Giant with ID " + id + "!");
+                return true;
+            } catch (NumberFormatException e) {
+                player.sendMessage(ChatColor.RED + "Invalid ID. Please enter a number.");
+                return false;
+            }
+        }
+
         return true;
     }
 
     @Override
     public List<String> onTabComplete(final CommandSender sender, final Command command, final String s, final String[] args) {
-        if(args.length == 1) return List.of("help", "kill");
+        if(args.length == 1) return List.of("help", "kill", "hostile");
 
-        if(args.length == 2) {
+        if(args.length == 2 && !args[0].equalsIgnoreCase("help")) {
             return getEntityIds().stream()
                     .map(Object::toString)
                     .toList();

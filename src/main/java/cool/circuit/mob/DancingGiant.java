@@ -4,7 +4,12 @@ import com.mojang.datafixers.util.Pair;
 import cool.circuit.goal.DanceGoal;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Giant;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -62,9 +67,16 @@ public class DancingGiant extends Giant {
         setPos(location.getX(), location.getY(), location.getZ());
 
         this.goalSelector.getAvailableGoals().clear();
-        this.goalSelector.addGoal(3, new DanceGoal(this));
+        this.goalSelector.addGoal(0, new DanceGoal(this));
         ((CraftWorld) location.getWorld()).getHandle().addFreshEntity(this);
 
         getEntityIds().add(this.getId());
+    }
+
+    public void makeHostile() {
+        this.goalSelector.addGoal(1, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(2, new RandomStrollGoal(this, 10));
+        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 10, true));
+        this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 }
