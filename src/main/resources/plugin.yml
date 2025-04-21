@@ -1,0 +1,8 @@
+name: DancingGiants
+version: '1.0'
+main: cool.circuit.DancingGiants
+api-version: '1.21'
+commands:
+  giant:
+    description: 'Creates a giant!'
+    permission: dancinggiants.command
