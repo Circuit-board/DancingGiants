@@ -1,10 +1,14 @@
 package cool.circuit.goal;
 
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.goal.Goal;
+import org.bukkit.Color;
+import org.bukkit.Particle;
+import org.bukkit.World;
 
-public final class DanceGoal extends Goal {
+public class DanceGoal extends Goal {
 
     private final PathfinderMob mob;
     private boolean crouching = false;
@@ -16,31 +20,37 @@ public final class DanceGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return true; // Always allow the goal to run
+        return true;
     }
 
     @Override
     public boolean canContinueToUse() {
-        return true; // Keep running forever
+        return true;
     }
 
     @Override
     public void start() {
-        timer = 20; // Start with a delay of 1 second
-        mob.setPose(Pose.STANDING); // Start standing
+        timer = 20;
+        mob.setPose(Pose.STANDING);
     }
 
     @Override
     public void stop() {
-        mob.setPose(Pose.STANDING); // Reset when stopping
+        mob.setPose(Pose.STANDING);
     }
 
     @Override
     public void tick() {
+
+        mob.getBukkitEntity().getWorld().spawnParticle(Particle.DUST, mob.getBukkitEntity().getLocation(), 10, 10, 10, 100, new Particle.DustOptions(Color.fromRGB(
+                (int) (Math.random() * 255),
+                (int) (Math.random() * 255),
+                (int) (Math.random() * 255)
+        ), 10f));
         if (--timer <= 0) {
             crouching = !crouching;
             mob.setPose(crouching ? Pose.CROUCHING : Pose.STANDING);
-            timer = 20; // Reset timer for 1 second
+            timer = 20;
         }
     }
 }
